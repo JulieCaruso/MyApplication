@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">My Application</string>
+
+
+    <!-- Sign in -->
+    <string name="signin">Sign In</string>
+    <string name="error_empty">Field mustn\'t be empty.</string>
+
+    <!-- Films -->
+    <string name="movies">Movies</string>
+    <string name="directed_by">Directed by %1$s</string>
+
 </resources>

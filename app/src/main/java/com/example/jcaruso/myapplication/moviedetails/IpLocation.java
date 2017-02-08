@@ -9,4 +9,8 @@ public class IpLocation {
     public IpLocation() {
 
     }
+
+    public String getCity() {
+        return city;
+    }
 }

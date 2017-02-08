@@ -68,9 +68,19 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/movie_details_location"
+        android:id="@+id/movie_details_location_ion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="bottom|center_horizontal" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/space_xl"/>
+
+    <TextView
+        android:id="@+id/movie_details_location_rxretrofit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/movie_details_location_ion"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/space_xl"/>
 
 </RelativeLayout>

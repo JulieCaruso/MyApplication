@@ -2,7 +2,6 @@ package com.example.jcaruso.myapplication.moviedetails;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,33 +10,34 @@ import android.widget.TextView;
 import com.example.jcaruso.myapplication.R;
 import com.example.jcaruso.myapplication.movie.Movie;
 import com.example.jcaruso.myapplication.movie.MovieManager;
+import com.google.gson.JsonObject;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
-
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit.RestAdapter;
-import retrofit.http.GET;
-import retrofit.http.Path;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.GET;
 
 public class MovieDetailsActivity extends AppCompatActivity {
 
     public static final String EXTRA_MOVIE_ID = "MovieDetailsActivity.EXTRA_MOVIE_ID";
+    private final String locationApiUrl = "http://ip-api.com/";
+
+    private TextView mLocationIon;
+    private TextView mLocationRxRetrofit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.movie_details_activity);
+
+        mLocationIon = (TextView) findViewById(R.id.movie_details_location_ion);
+        mLocationRxRetrofit = (TextView) findViewById(R.id.movie_details_location_rxretrofit);
 
         findViewById(R.id.movie_details_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +57,10 @@ public class MovieDetailsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //loadIpAddress();
+        Log.d("azerty", "start ion");
+        loadIpLocationIon();
+        Log.d("azerty", "start rxretrofit");
+        loadIpLocationRXRetrofit();
     }
 
     private void setView(Movie movie) {
@@ -69,46 +72,52 @@ public class MovieDetailsActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.movie_details_actors)).setText(movie.getActorsString());
     }
 
-    private Observable<String> getIpAddress() {
-        return new Observable<String>() {
-            @Override
-            protected void subscribeActual(Observer<? super String> observer) {
-                try {
-                    for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-                        NetworkInterface intf = en.nextElement();
-                        for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                            InetAddress inetAddress = enumIpAddr.nextElement();
-                            if (!inetAddress.isLoopbackAddress()) {
-                                String ip = Formatter.formatIpAddress(inetAddress.hashCode());
-                                observer.onNext(ip);
+    private void loadIpLocationIon() {
+        Ion.with(getApplicationContext())
+                .load(locationApiUrl + "json")
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override
+                    public void onCompleted(Exception e, final JsonObject result) {
+                        Log.d("azerty", "ion: " + result.get("city").getAsString());
+                        mLocationIon.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mLocationIon.setText(getString(R.string.location, result.get("city").getAsString()));
                             }
-                        }
+                        });
                     }
-                } catch (SocketException e) {
-                    observer.onError(e);
-                }
-            }
-        };
+                });
     }
 
-    private void loadIpAddress() {
-        Observable<String> observable = getIpAddress();
+    private void loadIpLocationRXRetrofit() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(locationApiUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build();
 
+        LocationService service = retrofit.create(LocationService.class);
+        Observable<IpLocation> observable = service.getLocation();
         observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<String>() {
+                .subscribe(new Observer<IpLocation>() {
                     @Override
                     public void onSubscribe(Disposable d) {
                     }
 
                     @Override
-                    public void onNext(String value) {
-                        loadIpLocation(value);
+                    public void onNext(final IpLocation value) {
+                        Log.d("azerty", "rxretrofit: " + value.getCity());
+                        mLocationRxRetrofit.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mLocationRxRetrofit.setText(getString(R.string.location, value.getCity()));
+                            }
+                        });
                     }
 
                     @Override
-                    public void onError(Throwable t) {
-                        Log.d("Test", "load ip address error: " + t.getMessage());
+                    public void onError(Throwable e) {
                     }
 
                     @Override
@@ -117,54 +126,8 @@ public class MovieDetailsActivity extends AppCompatActivity {
                 });
     }
 
-
-    private void loadIpLocation(final String ip) {
-        RestAdapter retrofit = new RestAdapter.Builder()
-                .setEndpoint("http://geo.groupkt.com")
-                .build();
-
-        /*Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://geo.groupkt.com/")
-                .addConverterFactory(GsonConverterFactory.create(new Gson()))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
-*/
-        final IpLocationService service = retrofit.create(IpLocationService.class);
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Subscriber<IpLocation> subscriber = new Subscriber<IpLocation>() {
-                    @Override
-                    public void onSubscribe(Subscription s) {
-
-                    }
-
-                    @Override
-                    public void onNext(IpLocation ipLocation) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable t) {
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                };
-                Observable<IpLocation> observable = service.getIpLocation(ip);
-                observable.subscribe((Observer<? super IpLocation>) subscriber);
-            }
-        }).start();
-
-
-    }
-
-    public interface IpLocationService {
-        @GET("/ip/{ip}/json")
-        Observable<IpLocation> getIpLocation(@Path("ip") String ip);
+    public interface LocationService {
+        @GET("json")
+        Observable<IpLocation> getLocation();
     }
 }

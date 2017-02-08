@@ -13,7 +13,6 @@ public class Movie {
     public Movie(String title, String director, List<String> actors, String imageUrl) {
         mTitle = title;
         mDirector = director;
-        mActors.clear();
         if (actors != null) mActors.addAll(actors);
         mImageUrl = imageUrl;
     }

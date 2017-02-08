@@ -19,7 +19,7 @@
         android:textSize="@dimen/text_size_subtitle"
         android:layout_margin="@dimen/space_m"/>
 
-    <View android:background="@color/colorAccent"
+    <View android:background="#D5D5D5"
         android:layout_width = "match_parent"
         android:layout_height="1dp"/>
 

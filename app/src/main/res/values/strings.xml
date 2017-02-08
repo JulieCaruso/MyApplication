@@ -6,8 +6,13 @@
     <string name="signin">Sign In</string>
     <string name="error_empty">Field mustn\'t be empty.</string>
 
-    <!-- Films -->
+    <!-- Movies -->
     <string name="movies">Movies</string>
     <string name="directed_by">Directed by %1$s</string>
+    <string name="location">You are located in %1$s.</string>
+
+    <!-- Actions -->
+    <string name="action_back">Back</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

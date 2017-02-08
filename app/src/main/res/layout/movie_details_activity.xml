@@ -4,31 +4,53 @@
     android:id="@+id/movie_details_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.jcaruso.myapplication.moviedetails.MovieDetailsActivity">
+
+    <LinearLayout
+        android:id="@+id/movie_details_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/space_m">
+
+        <ImageView
+            android:id="@+id/movie_details_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_chevron_left_black_48dp" />
+
+        <TextView
+            android:id="@+id/movie_details_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="@dimen/text_size_big_title" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/movie_details_toolbar_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/movie_details_toolbar"
+        android:background="#60ACACAC" />
 
     <ImageView
         android:id="@+id/movie_details_image"
         android:layout_width="@dimen/movie_image_width"
         android:layout_height="@dimen/movie_image_height"
-        android:layout_marginStart="@dimen/space_m" />
+        android:layout_below="@id/movie_details_toolbar_shadow"
+        android:layout_margin="@dimen/space_m" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignTop="@id/movie_details_image"
         android:layout_toEndOf="@id/movie_details_image"
         android:orientation="vertical"
         android:padding="@dimen/space_m">
-
-        <TextView
-            android:id="@+id/movie_details_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/space_s"
-            android:textSize="@dimen/text_size_title" />
 
         <TextView
             android:id="@+id/movie_details_director"
@@ -44,5 +66,11 @@
             android:layout_marginBottom="@dimen/space_s"
             android:textSize="@dimen/text_size_subtitle" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/movie_details_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="bottom|center_horizontal" />
 
 </RelativeLayout>

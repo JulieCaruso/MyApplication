@@ -1,10 +1,16 @@
 package com.example.jcaruso.myapplication;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.jcaruso.myapplication.movie.MovieActivity;
+
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,9 +31,11 @@ public class MainActivityTest {
     private EditText password;
     private Button signin;
 
+    private Activity activity;
+
     @Before
     public void setup() {
-        Activity activity = Robolectric.setupActivity(MainActivity.class);
+        activity = Robolectric.setupActivity(MainActivity.class);
         username = (EditText) activity.findViewById(R.id.main_username);
         password = (EditText) activity.findViewById(R.id.main_password);
         signin = (Button) activity.findViewById(R.id.main_sign_in);
@@ -41,6 +49,9 @@ public class MainActivityTest {
 
         ShadowApplication application = Shadows.shadowOf(RuntimeEnvironment.application);
         Assert.assertThat("MovieActivity has started", application.getNextStartedActivity(), Is.is(CoreMatchers.notNullValue()));
+
+        Intent intent = Shadows.shadowOf(activity).peekNextStartedActivityForResult().intent;
+        Assert.assertThat("MovieActivity has started", intent.getComponent(), Matchers.equalTo(new ComponentName(activity, MovieActivity.class)));
     }
 
     @Test

@@ -1,10 +1,14 @@
 package com.example.jcaruso.myapplication;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 
 import com.example.jcaruso.myapplication.movie.MovieActivity;
+import com.example.jcaruso.myapplication.moviedetails.MovieDetailsActivity;
 
+import org.hamcrest.Matchers;
 import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,9 +27,11 @@ public class MovieActivityTest {
 
     private RecyclerView recycler;
 
+    private Activity activity;
+
     @Before
     public void setup() {
-        Activity activity = Robolectric.setupActivity(MovieActivity.class);
+        activity = Robolectric.setupActivity(MovieActivity.class);
         recycler = (RecyclerView) activity.findViewById(R.id.movie_recycler);
     }
 
@@ -39,5 +45,9 @@ public class MovieActivityTest {
         recycler.findViewHolderForAdapterPosition(0).itemView.performClick();
         ShadowApplication application = Shadows.shadowOf(RuntimeEnvironment.application);
         Assert.assertThat("MovieDetailsActivity has started", application.getNextStartedActivity(), IsNull.notNullValue());
+
+        Intent intent = Shadows.shadowOf(activity).peekNextStartedActivityForResult().intent;
+        Assert.assertThat("MovieDetailsActivity has started", intent.getComponent(), Matchers.equalTo(new ComponentName(activity, MovieDetailsActivity.class)));
+        Assert.assertEquals("extra contains correct movie id : 0", intent.getIntExtra(MovieDetailsActivity.EXTRA_MOVIE_ID, 1), 0);
     }
 }

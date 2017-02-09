@@ -34,7 +34,7 @@ public class MovieDetailsActivityTest {
 
     private Movie movie;
 
-    ShadowActivity shadowActivity;
+    ShadowActivity shadowActivity;//
 
     @Before
     public void setup() {
